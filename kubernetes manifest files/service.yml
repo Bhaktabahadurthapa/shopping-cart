@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: spring-boot-app-service
+  name: shoppingcard-service
 spec:
   type: NodePort
   ports:
@@ -11,4 +11,4 @@ spec:
     targetPort: 8080
     protocol: TCP
   selector:
-    app: spring-boot-app
+    app: shoppingcard

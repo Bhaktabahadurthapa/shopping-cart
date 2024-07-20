@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-boot-app
+  name: shoppingcard
   labels:
-    app: spring-boot-app
+    app: sshoppingcard
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: spring-boot-app
+      app: shoppingcard
   template:
     metadata:
       labels:
-        app: spring-boot-app
+        app: shoppingcard
     spec:
       containers:
-      - name: spring-boot-app
-        image: lishan2023/java-app:1
+      - name: shoppingcard
+        image: lishan2023/shoppingcard:replaceImageTag
         ports:
         - containerPort: 8080
