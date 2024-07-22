@@ -4,7 +4,10 @@ pipeline {
         maven 'maven3'
     }
     environment {
-        DOCKER_IMAGE = "lishan2023/shoppingcard:${BUILD_NUMBER}"
+        DOCKER_IMAGE = "your-docker-repo/your-image-name:${env.BUILD_NUMBER}"
+        SONAR_URL = "http://16.16.67.133:9000"
+        GIT_REPO_NAME = "shoppingcard"
+        GIT_USER_NAME = "bhaktabahadurthapa"
     }
     stages {
         stage('compile') {
@@ -25,13 +28,10 @@ pipeline {
         stage('Checkout') {
             steps {
                 sh 'echo passed'
-                //git branch: 'main', url: 'https://github.com/bhaktabahadurthapa/'
+                // git branch: 'main', url: 'https://github.com/bhaktabahadurthapa/'
             }
         }
         stage('Static Code Analysis') {
-            environment {
-                SONAR_URL = "http://16.16.67.133:9000"
-            }
             steps {
                 withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
                     sh 'mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
@@ -55,10 +55,7 @@ pipeline {
         stage('Install Trivy') {
             steps {
                 script {
-                    // Check if Trivy is installed
                     def trivyInstalled = sh(script: 'command -v trivy', returnStatus: true) == 0
-
-                    // If Trivy is not installed, install it
                     if (!trivyInstalled) {
                         sh '''
                             apt-get update && apt-get install -y wget
@@ -71,23 +68,18 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 script {
-                    // Run Trivy image scan
                     sh 'trivy image --format table ${DOCKER_IMAGE}'
                 }
             }
         }
         stage('Update Deployment File') {
-            environment {
-                GIT_REPO_NAME = "shoppingcard"
-                GIT_USER_NAME = "bhaktabahadurthapa"
-            }
             steps {
                 withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                     sh '''
                         git config user.email "bhaktathapamgr5@gmail.com"
                         git config user.name "bhaktabahadurthapa"
-                        sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" kubernetes manifest files/deployment.yml
-                        git add kubernetes manifest files/deployment.yml
+                        sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" kubernetes/manifest/files/deployment.yml
+                        git add kubernetes/manifest/files/deployment.yml
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                         git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                     '''
