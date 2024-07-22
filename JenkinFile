@@ -11,18 +11,30 @@ pipeline {
     }
     stages {
         stage('compile') {
-            steps {     
-                sh 'mvn compile'
+            steps {
+                script {
+                    // Set permissions for application.properties
+                    sh 'chmod 644 /var/lib/jenkins/workspace/project/target/classes/application.properties'
+                    sh 'mvn compile'
+                }
             }
         }
         stage('test') {
-            steps {     
-                sh 'mvn test'
+            steps {
+                script {
+                    // Set permissions for application.properties
+                    sh 'chmod 644 /var/lib/jenkins/workspace/project/target/classes/application.properties'
+                    sh 'mvn test'
+                }
             }
         }
         stage('build') {
-            steps {     
-                sh 'mvn package'
+            steps {
+                script {
+                    // Set permissions for application.properties
+                    sh 'chmod 644 /var/lib/jenkins/workspace/project/target/classes/application.properties'
+                    sh 'mvn package'
+                }
             }
         }
         stage('Checkout') {
