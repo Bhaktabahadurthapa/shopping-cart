@@ -1,5 +1,5 @@
 pipeline {
-    agent any 
+    agent any
     tools {
         maven 'maven3'
     }
@@ -40,7 +40,6 @@ pipeline {
         }
         stage('Build and Push Docker Image') {
             environment {
-                DOCKER_IMAGE = "lishan2023/shoppingcard:${BUILD_NUMBER}"
                 REGISTRY_CREDENTIALS = credentials('docker-cred')
             }
             steps {
@@ -62,8 +61,8 @@ pipeline {
                     // If Trivy is not installed, install it
                     if (!trivyInstalled) {
                         sh '''
-                          apt-get update && apt-get install -y wget
-                          wget -qO- https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                            apt-get update && apt-get install -y wget
+                            wget -qO- https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
                         '''
                     }
                 }
@@ -73,7 +72,7 @@ pipeline {
             steps {
                 script {
                     // Run Trivy image scan
-                    sh 'trivy image --format table lishan2023/shoppingcard:${BUILD_NUMBER}'
+                    sh 'trivy image --format table ${DOCKER_IMAGE}'
                 }
             }
         }
@@ -87,7 +86,6 @@ pipeline {
                     sh '''
                         git config user.email "bhaktathapamgr5@gmail.com"
                         git config user.name "bhaktabahadurthapa"
-                        BUILD_NUMBER=${BUILD_NUMBER}
                         sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" kubernetes manifest files/deployment.yml
                         git add kubernetes manifest files/deployment.yml
                         git commit -m "Update deployment image to version ${BUILD_NUMBER}"
