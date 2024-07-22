@@ -1,13 +1,22 @@
 pipeline {
-  agent {
-    docker {
-      image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+  agent any 
+    tools {
+      maven 'maven3'
     }
-  }
   environment {
     DOCKER_IMAGE = "lishan2023/shoppingcard:${BUILD_NUMBER}"
   }
+ stage('compile') {
+      steps {     
+        sh 'mvn compile'
+      }
+    }
+stage('test') {
+      steps {     
+        sh 'mvn test'
+      }
+    }
+
   stages {
     stage('Checkout') {
       steps {
@@ -15,16 +24,9 @@ pipeline {
         //git branch: 'main', url: 'https://github.com/bhaktabahadurthapa/'
       }
     }
-    stage('Build and Test') {
-      steps {
-        sh 'ls -ltr'
-        // build the project and create a JAR file
-        sh ' mvn clean package'
-      }
-    }
     stage('Static Code Analysis') {
       environment {
-        SONAR_URL = "http://51.21.132.126:9000"
+        SONAR_URL = "http://16.16.67.133:9000"
       }
       steps {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {

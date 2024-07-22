@@ -6,4 +6,6 @@ COPY target/shopping-cart-0.0.1-SNAPSHOT.jar $APP_HOME/app.jar
 
 WORKDIR $APP_HOME
 
+EXPOSE  8080
+
 ENTRYPOINT exec java -jar app.jar
